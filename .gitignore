@@ -1,2 +1,5 @@
-# Sublime-specific files
+# checkpoint files
 checkpoints/*.h5
+
+# ipython checkpoints
+.ipynb_checkpoints
