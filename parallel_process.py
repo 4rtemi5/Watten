@@ -2,6 +2,7 @@ import traceback
 from tqdm import tqdm
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
+
 def mp_map(function, array, n_jobs=4, use_kwargs=False, front_num=1):
     """
         A parallel version of the map function with a progress bar. 
@@ -17,17 +18,17 @@ def mp_map(function, array, n_jobs=4, use_kwargs=False, front_num=1):
         Returns:
             [function(array[0]), function(array[1]), ...]
     """
-    #We run the first few iterations serially to catch bugs
+    # We run the first few iterations serially to catch bugs
     front = []
     out = []
     if front_num > 0:
         front = [function(**a) if use_kwargs else function(a) for a in array[:front_num]]
-    #If we set n_jobs to 1, just run a list comprehension. This is useful for benchmarking and debugging.
+    # If we set n_jobs to 1, just run a list comprehension. This is useful for benchmarking and debugging.
     if n_jobs==1:
         return front + [function(**a) if use_kwargs else function(a) for a in tqdm(array[front_num:])]
-    #Assemble the workers
+    # Assemble the workers
     with ProcessPoolExecutor(max_workers=n_jobs) as pool:
-        #Pass the elements of array into function
+        # Pass the elements of array into function
         if use_kwargs:
             futures = [pool.submit(function, **a) for a in array[front_num:]]
         else:
@@ -38,7 +39,7 @@ def mp_map(function, array, n_jobs=4, use_kwargs=False, front_num=1):
             'unit_scale': True,
             'leave': True
         }
-        #Print out the progress as tasks complete
+        # Print out the progress as tasks complete
         for future in tqdm(as_completed(futures), **kwargs):
             try:
                 out.append(future.result())
